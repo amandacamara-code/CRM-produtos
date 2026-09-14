@@ -1,0 +1,176 @@
+# 💎 CRM Produtos
+
+Sistema web de **gestão de produtos e faturamento**, feito para o responsável pela área
+de Produtos controlar produtos comercializados, cadastros, vendas, carteira de clientes
+e desempenho financeiro.
+
+Não é um protótipo visual: todos os cards, gráficos, tabelas e indicadores são
+calculados a partir dos dados cadastrados. Ao adicionar um produto, cliente ou venda,
+o dashboard muda na hora.
+
+---
+
+## Os três números no centro do sistema
+
+O dashboard começa pelos números que respondem "como está a operação?" em 10 segundos:
+
+| | O que responde |
+|---|---|
+| 💰 **Faturamento** | quanto já entrou |
+| 💼 **Carteira** | quanto está ativo hoje |
+| 🎯 **Pipeline** | quanto ainda pode entrar |
+| 📈 **Faturamento projetado** | carteira + pipeline — sinalizado como **projeção**, não receita recebida |
+
+---
+
+## Como usar
+
+Abra o `index.html` no navegador. Não há build, servidor, dependências nem instalação.
+
+```
+git clone <repo> && cd CRM-produtos
+# abra index.html no navegador (ou sirva a pasta com qualquer servidor estático)
+python3 -m http.server 8080
+```
+
+O sistema já vem com dados fictícios de demonstração (10 produtos, 45 clientes,
+14 meses de vendas, funil preenchido). Para começar a usar com dados reais:
+
+**Configurações → Backup dos dados → 🗑️ Começar do zero**
+
+---
+
+## Funcionalidades
+
+### Telas
+
+| Menu | Tela | O que faz |
+|---|---|---|
+| **Principal** | 📊 Dashboard | Visão executiva, 6 cards de indicadores, gráfico de faturamento, funil, prioridades, cadastros recentes e tarefas |
+| | 👥 Cadastros | Lista de leads/oportunidades com busca, filtros, ordenação e exportação |
+| | 🎯 Funil de Vendas | Kanban com **arrastar e soltar** entre etapas |
+| **Produtos** | 📦 Produtos | Catálogo completo: criar, editar, duplicar, desativar, arquivar, excluir |
+| | 🔗 Links de Cadastro | Copiar, abrir, editar e **gerar QR Code** do link de cada produto |
+| | 📊 Desempenho dos Produtos | Vendas, faturamento, clientes, ticket, margem, participação e crescimento |
+| **Gestão** | ✅ Tarefas | Agrupadas por atrasadas / hoje / próximas / concluídas |
+| | 💼 Carteira | Carteira total, clientes ativos, receita mensal, projeção anual, ticket médio |
+| | 💰 Financeiro | Bruto, descontos, comissões, custos, líquido, margem e comissões por consultor |
+| | 👥 Clientes | Base completa com valor comprado, carteira e pipeline por cliente |
+| **Análise** | 📈 Relatórios | 9 relatórios com filtro de período e exportação Excel/PDF |
+| | 🏆 Ranking de Produtos | Pódio 🥇🥈🥉 e destaques (mais vendido, maior margem, maior crescimento, menor desempenho) |
+| **Configurações** | ⚙️ Configurações | Tudo que torna o sistema editável sem código |
+
+### Regras automáticas
+
+Quando uma oportunidade muda de etapa, o sistema reage sozinho:
+
+- **PAGO / FECHADO** → registra a venda, atualiza faturamento, carteira, número de
+  clientes, ticket médio, gráficos e relatórios. Em **PAGO**, também contabiliza como
+  receita recebida.
+- **CANCELADO** → retira os valores dos indicadores de receita ativa e da carteira.
+- **Voltou para uma etapa aberta** → desfaz a venda gerada e o valor retorna ao pipeline.
+
+### Fórmulas
+
+```
+Faturamento bruto   = soma das vendas ativas do período
+Faturamento líquido = bruto − descontos − custos − comissões
+Ticket médio        = faturamento ÷ quantidade de vendas
+Margem              = lucro ÷ faturamento × 100
+Receita mensal      = valor do contrato ÷ meses da periodicidade
+Projeção anual      = receita mensal × 12
+```
+
+---
+
+## Editável sem programação
+
+O responsável pela área cria e ajusta tudo pela interface. Em **Configurações**:
+
+- **Geral** — nome da empresa, gestor, meta de faturamento, meta de vendas, domínio base dos links
+- **Produtos** — adicionar, editar, duplicar, arquivar e excluir produtos
+- **Categorias e listas** — categorias, tipos de produto, origens de cadastro
+- **Status e etapas** — etapas do funil, status de produto, de venda, de tarefa, de cliente e prioridades
+- **Comissões e pagamentos** — tabelas de comissão, formas de pagamento, tipos de cobrança, periodicidades
+- **Usuários e acessos** — usuários e perfis
+- **Backup dos dados** — exportar/importar JSON, recarregar demonstração, zerar o sistema
+
+Criar uma etapa nova no funil, por exemplo, faz surgir uma coluna a mais no kanban,
+na ordem definida, já contando no pipeline — sem tocar em uma linha de código.
+
+---
+
+## Perfis de acesso
+
+| Perfil | Acesso |
+|---|---|
+| **Administrador** | Total, incluindo configurações e usuários |
+| **Gestor de Produtos** | Produtos, vendas, carteira, financeiro e relatórios |
+| **Consultor / Vendedor** | Apenas os próprios clientes, leads, vendas e tarefas |
+| **Visualizador** | Somente leitura |
+
+O seletor no rodapé do menu lateral troca o usuário ativo — o menu, os dados e os
+botões de ação se ajustam ao perfil.
+
+---
+
+## Estrutura de dados
+
+`usuarios` · `produtos` · `clientes` · `oportunidades` · `vendas` · `tarefas`,
+mais a árvore `config` com todas as listas editáveis.
+
+Os dados ficam no **localStorage** do navegador — nada é enviado a nenhum servidor.
+Para migrar de máquina, use o backup JSON em Configurações.
+
+Para ligar a um banco real (PostgreSQL, Firebase, Supabase…), o ponto de troca é
+`assets/js/store.js`: as funções `load`, `save`, `list`, `get`, `upsert` e `remove`
+concentram toda a persistência. O restante do sistema não conhece o meio de armazenamento.
+
+---
+
+## Arquitetura
+
+Sem framework, sem build, sem dependências externas — abre direto do disco e funciona offline.
+
+```
+index.html
+assets/css/style.css            Design system (azul-marinho + dourado, mobile first)
+assets/js/
+  util.js                       Formatação (R$, datas pt-BR), períodos, exportação CSV
+  qrcode.js                     Gerador de QR Code próprio (modo byte, nível M, v1–12)
+  store.js                      Modelo de dados, persistência, permissões e regras automáticas
+  metrics.js                    Todos os indicadores derivados
+  charts.js                     Gráficos em SVG puro (barras+linha, rosca, funil, sparkline)
+  ui.js                         Modais, toasts, tabelas, badges, seletor de período
+  forms.js                      Formulários e telas de detalhe
+  views/                        Uma tela por arquivo (13 telas)
+  app.js                        Roteamento, menu lateral e ciclo de vida
+```
+
+**QR Code:** implementação própria, validada byte a byte contra a biblioteca de
+referência `qrcode` (npm) — as matrizes geradas são idênticas.
+
+---
+
+## Interface
+
+- **Mobile first**, validado de 360px a 1440px sem overflow horizontal
+- No celular: menu pelo botão ☰, barra inferior de atalhos, filtros recolhíveis e cards compactos
+- Cards arredondados, sombras suaves, ícones, tipografia moderna, muito espaço em branco
+- Azul-marinho como cor principal · dourado para o financeiro · verde para pagamentos ·
+  vermelho para cancelamentos · laranja para negociações · roxo para propostas
+- Layout de impressão dedicado: o PDF sai sem menu nem filtros, como um relatório de verdade
+
+### Atalhos
+
+`N` novo cadastro · `V` nova venda · `Esc` fecha modais e menu
+
+---
+
+## Perguntas que o sistema responde
+
+Quanto faturamos este mês · quanto temos em carteira · quanto temos a receber ·
+quais produtos vendem mais · qual gera mais faturamento · qual tem maior margem ·
+quantos clientes temos · quantas vendas estão em negociação · qual o valor potencial
+do funil · quanto cada produto representa do total · qual o crescimento sobre o mês
+anterior · quem são os clientes ativos · quais vendas precisam de acompanhamento.
