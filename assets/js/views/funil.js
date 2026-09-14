@@ -26,7 +26,7 @@
   function cardHTML(o, pode) {
     const cli = Store.L.cliente(o.clienteId) || {};
     const prio = Store.L.prioridade(o.prioridadeId) || {};
-    const corPrio = { red: '#ef4444', gold: '#f0b429', green: '#10b981' }[prio.cor] || '#cbd5e1';
+    const corPrio = { red: '#C4183C', gold: '#EAB308', green: '#0E9F6E' }[prio.cor] || '#DACFC7';
     return `<article class="kcard" draggable="${pode ? 'true' : 'false'}" data-id="${o.id}" tabindex="0">
       <div class="prio-bar" style="background:${corPrio}" title="Prioridade ${U.esc(prio.nome || '')}"></div>
       <div class="kcard__top">
@@ -61,7 +61,7 @@
 
       const colunas = etapas.map(e => {
         const itens = U.sortBy(arr.filter(o => o.etapaId === e.id), o => o.valor, 'desc');
-        const corMap = { blue: '#2563eb', purple: '#7c3aed', orange: '#f97316', gold: '#f0b429', green: '#10b981', red: '#ef4444' };
+        const corMap = { blue: '#2563eb', purple: '#7c3aed', orange: '#D97706', gold: '#EAB308', green: '#0E9F6E', red: '#C4183C' };
         return `<section class="kcol" data-etapa="${e.id}">
           <header class="kcol__head">
             <div class="kcol__title">
@@ -83,7 +83,7 @@
         ${UI.kpi({ icone: '🎯', titulo: 'Pipeline aberto', valor: U.money0(pipe.valor), cor: 'orange', sub: pipe.qtd + ' oportunidades' })}
         ${UI.kpi({ icone: '📈', titulo: 'Taxa de conversão', valor: U.pct(pipe.taxaConversao), cor: 'green', sub: pipe.ganhas + ' ganhas · ' + pipe.perdidas + ' perdidas' })}
         ${UI.kpi({ icone: '💵', titulo: 'Ticket médio no funil', valor: U.money0(pipe.ticketMedio), cor: 'blue' })}
-        ${UI.kpi({ icone: '🏁', titulo: 'Valor já ganho', valor: U.money0(pipe.valorGanho), cor: 'navy' })}
+        ${UI.kpi({ icone: '🏁', titulo: 'Valor já ganho', valor: U.money0(pipe.valorGanho), cor: 'ink' })}
       </div>
 
       <details class="filtrobox" ${temFiltro ? 'open' : ''}>
@@ -94,7 +94,7 @@
           <select class="input input--sm" id="fResp" style="max-width:190px">${UI.opcoes(Store.list('usuarios'), estado.responsavel, { vazio: 'Todos responsáveis' })}</select>
           <select class="input input--sm" id="fPrio" style="max-width:160px">${UI.opcoes(Store.config.prioridades, estado.prioridade, { vazio: 'Todas prioridades' })}</select>
           <label class="switch"><input type="checkbox" id="fEncerradas" ${estado.mostrarEncerradas ? 'checked' : ''}><span class="small">Mostrar canceladas</span></label>
-          ${Store.podeEditar() ? `<button class="btn btn--sm btn--gold" data-novo style="margin-left:auto">＋ Nova oportunidade</button>` : ''}
+          ${Store.podeEditar() ? `<button class="btn btn--sm btn--fire" data-novo style="margin-left:auto">＋ Nova oportunidade</button>` : ''}
         </div>
       </details>
 

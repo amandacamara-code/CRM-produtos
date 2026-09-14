@@ -96,7 +96,7 @@
         titulo: o.titulo, tamanho: 'sm',
         corpo: `<p class="small">${o.mensagem}</p>`,
         rodape: `<button class="btn btn--soft" data-no>${U.esc(o.cancelar)}</button>
-                 <button class="btn ${o.perigo ? 'btn--red' : 'btn--navy'}" data-yes>${U.esc(o.confirmar)}</button>`
+                 <button class="btn ${o.perigo ? 'btn--red' : 'btn--ink'}" data-yes>${U.esc(o.confirmar)}</button>`
       });
       m.foot.querySelector('[data-no]').onclick = () => { m.close(); resolve(false); };
       m.foot.querySelector('[data-yes]').onclick = () => { m.close(); resolve(true); };
@@ -129,9 +129,10 @@
   /** kpi({icone, titulo, valor, cor, linhas:[{label,valor}], rodape}) */
   function kpi(o) {
     const cores = {
-      blue: ['#2563eb', '#dbeafe'], green: ['#059669', '#d1fae5'], gold: ['#d99e0b', '#fdf3d7'],
-      red: ['#dc2626', '#fee2e2'], purple: ['#7c3aed', '#ede9fe'], orange: ['#ea580c', '#ffedd5'],
-      navy: ['#13294b', '#e2e8f5'], cyan: ['#0891b2', '#cffafe']
+      fire: ['#E8400D', '#FDE8DD'],
+      blue: ['#2563eb', '#dbeafe'], green: ['#047857', '#d1fae5'], gold: ['#B45309', '#FEF3C7'],
+      red: ['#A31031', '#FCE4EA'], purple: ['#6D28D9', '#ede9fe'], orange: ['#B45309', '#FEF0D9'],
+      ink: ['#2A1E17', '#EFE7E1'], cyan: ['#0891b2', '#cffafe']
     };
     const c = cores[o.cor || 'blue'] || cores.blue;
     const linhas = (o.linhas || []).map(l =>
@@ -213,7 +214,7 @@
         <div class="field"><label>De</label><input type="date" class="input" id="pcDe" value="${U.esc(atual.de)}"></div>
         <div class="field"><label>Até</label><input type="date" class="input" id="pcAte" value="${U.esc(atual.ate)}"></div>
       </div>`,
-      rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--navy" data-ok>Aplicar</button>`
+      rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--ink" data-ok>Aplicar</button>`
     });
     m.foot.querySelector('[data-ok]').onclick = () => {
       const de = m.body.querySelector('#pcDe').value;
@@ -254,7 +255,7 @@
       tamanho: 'sm', corpo: conteudo,
       rodape: `<button class="btn btn--soft" data-close>Fechar</button>
                <button class="btn btn--ghost" data-baixar>📥 Baixar SVG</button>
-               <button class="btn btn--navy" data-copiar>📋 Copiar link</button>`
+               <button class="btn btn--ink" data-copiar>📋 Copiar link</button>`
     });
     const b = m.foot.querySelector('[data-baixar]');
     if (b) b.onclick = () => {
@@ -292,7 +293,7 @@
   function exportarPDF(titulo) {
     toast('Abrindo a janela de impressão — escolha "Salvar como PDF".', 'info', 4200);
     const antes = document.title;
-    document.title = titulo || 'CRM Produtos — Relatório';
+    document.title = titulo || 'CRM de Produtos da Firece — Relatório';
     setTimeout(() => {
       window.print();
       document.title = antes;

@@ -14,7 +14,7 @@
   }
 
   Views.dashboard = {
-    titulo: '💎 CRM Produtos',
+    titulo: 'CRM de Produtos da Firece',
     subtitulo: 'Gestão de Produtos e Faturamento',
 
     render() {
@@ -86,7 +86,7 @@
           <span class="small strong">🎯 Meta de faturamento · ${U.esc(mesNome)}</span>
           <span class="small"><b>${U.money(ex.faturamento.bruto)}</b> <span class="muted">de ${U.money(metaMes)}</span></span>
         </div>
-        <div class="bar-track" style="height:9px"><div class="bar-fill" style="width:${pctMeta.toFixed(1)}%;background:linear-gradient(90deg,#f0b429,#d99e0b)"></div></div>
+        <div class="bar-track" style="height:9px"><div class="bar-fill" style="width:${pctMeta.toFixed(1)}%;background:linear-gradient(90deg,#F26522,#C4350A)"></div></div>
         <div class="spread mt-sm tiny muted"><span>${U.pct(pctMeta)} da meta</span>
           <span>faltam ${U.money(Math.max(0, metaMes - ex.faturamento.bruto))}</span></div>
       </div>` : ''}
@@ -115,7 +115,7 @@
             ]
           })}
           ${UI.kpi({
-            icone: '💰', titulo: 'Faturamento do Mês', cor: 'gold',
+            icone: '💰', titulo: 'Faturamento do Mês', cor: 'fire',
             valor: U.money0(ex.faturamento.bruto),
             sub: UI.trend(compMes.deltaBruto) + ' <span class="muted">vs. ' + U.money0(ex.faturamentoAnterior.bruto) + ' no mês anterior</span>',
             linhas: [
@@ -125,7 +125,7 @@
             ]
           })}
           ${UI.kpi({
-            icone: '💼', titulo: 'Valor em Carteira', cor: 'navy',
+            icone: '💼', titulo: 'Valor em Carteira', cor: 'ink',
             valor: U.money0(ex.carteira.total),
             linhas: [
               { label: 'Clientes ativos', valor: U.num(ex.carteira.clientesAtivos) },
@@ -170,8 +170,8 @@
             ${UI.periodoChips(estado.periodo)}
             <div class="mt">${Charts.faturamento(serie)}</div>
             <div class="chart-legend">
-              <span><i style="background:#2563eb"></i>Faturamento bruto</span>
-              <span><i style="background:#059669"></i>Faturamento líquido</span>
+              <span><i style="background:#E8400D"></i>Faturamento bruto</span>
+              <span><i style="background:#047857"></i>Faturamento líquido</span>
             </div>
             <div class="divider"></div>
             <div class="grid grid--4">
@@ -211,7 +211,7 @@
                     <b>${U.pct(p.pct)}</b>
                   </div>
                   <div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:${
-                    { red: '#ef4444', gold: '#f0b429', green: '#10b981' }[p.prioridade.cor] || '#64748b'}"></div></div>
+                    { red: '#C4183C', gold: '#EAB308', green: '#0E9F6E' }[p.prioridade.cor] || '#7A6A61'}"></div></div>
                   <div class="tiny muted">${U.money(p.valor)} em potencial</div>
                 </div>`).join('')}
               <div class="divider"></div>

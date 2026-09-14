@@ -178,7 +178,7 @@
     },
     /** cor determinística a partir de um texto (avatares) */
     colorFor(s) {
-      const palette = ['#2563eb', '#7c3aed', '#059669', '#ea580c', '#0891b2', '#db2777', '#4f46e5', '#b45309'];
+      const palette = ['#E8400D', '#7c3aed', '#047857', '#B45309', '#0E8C9E', '#BE185D', '#4338CA', '#8A6A2B'];
       let h = 0;
       const str = String(s || '');
       for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;

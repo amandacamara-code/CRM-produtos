@@ -1,4 +1,4 @@
-# 💎 CRM Produtos
+# CRM de Produtos da Firece
 
 Sistema web de **gestão de produtos e faturamento**, feito para o responsável pela área
 de Produtos controlar produtos comercializados, cadastros, vendas, carteira de clientes
@@ -134,7 +134,8 @@ Sem framework, sem build, sem dependências externas — abre direto do disco e 
 
 ```
 index.html
-assets/css/style.css            Design system (azul-marinho + dourado, mobile first)
+assets/css/style.css            Design system da marca Firece (mobile first)
+assets/img/firece-mark.svg      Símbolo da marca, usado no menu e no favicon
 assets/js/
   util.js                       Formatação (R$, datas pt-BR), períodos, exportação CSV
   qrcode.js                     Gerador de QR Code próprio (modo byte, nível M, v1–12)
@@ -157,8 +158,13 @@ referência `qrcode` (npm) — as matrizes geradas são idênticas.
 - **Mobile first**, validado de 360px a 1440px sem overflow horizontal
 - No celular: menu pelo botão ☰, barra inferior de atalhos, filtros recolhíveis e cards compactos
 - Cards arredondados, sombras suaves, ícones, tipografia moderna, muito espaço em branco
-- Azul-marinho como cor principal · dourado para o financeiro · verde para pagamentos ·
-  vermelho para cancelamentos · laranja para negociações · roxo para propostas
+- Paleta da marca Firece: laranja `#E8400D` como cor principal, sobre neutros quentes
+  e um escuro amadeirado no menu e no painel executivo
+- O laranja da marca é reservado para identidade e ações principais. As cores de
+  status ficam deliberadamente afastadas dele, para que nenhum indicador seja
+  confundido com elemento de marca: verde para pagamentos, carmim para cancelamentos,
+  âmbar para negociações, dourado para pagamento em andamento, roxo para propostas e
+  azul para novos cadastros
 - Layout de impressão dedicado: o PDF sai sem menu nem filtros, como um relatório de verdade
 
 ### Atalhos
@@ -174,3 +180,14 @@ quais produtos vendem mais · qual gera mais faturamento · qual tem maior marge
 quantos clientes temos · quantas vendas estão em negociação · qual o valor potencial
 do funil · quanto cada produto representa do total · qual o crescimento sobre o mês
 anterior · quem são os clientes ativos · quais vendas precisam de acompanhamento.
+
+
+---
+
+## Sobre o logotipo
+
+O símbolo em `assets/img/firece-mark.svg` foi **redesenhado em SVG** a partir da
+imagem da marca, porque o arquivo original não estava disponível. Ele é fiel ao
+traço, mas não é o arquivo oficial. Para usar o vetor original, substitua esse
+arquivo e o `<svg class="brand__mark">` no `index.html` — a cor vem de
+`--fire-500`, então basta manter `fill="currentColor"` ou o mesmo laranja.

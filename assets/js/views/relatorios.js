@@ -203,7 +203,7 @@
           ],
           grafico: Charts.hbars(dados.slice(0, 10).map(d => ({
             label: d.produto.nome, valor: d.margemPct,
-            cor: d.margemPct >= 30 ? '#059669' : d.margemPct >= 15 ? '#f0b429' : '#ef4444'
+            cor: d.margemPct >= 30 ? '#047857' : d.margemPct >= 15 ? '#D97706' : '#C4183C'
           })), { formato: v => U.pct(v) }),
           colunas: ['Produto', 'Faturamento', 'Custos', 'Comissões', 'Líquido', 'Margem %'],
           linhas: dados.map(d => [d.produto.nome, d.faturamento, d.custo, d.comissao, d.liquido, d.margemPct]),
@@ -290,8 +290,8 @@
           ${Object.keys(RELATORIOS).map(k => {
             const d = RELATORIOS[k];
             const on = k === estado.tipo;
-            return `<button class="card" data-rel="${k}" style="text-align:left;cursor:pointer;border:1px solid ${on ? 'var(--navy-700)' : 'var(--line)'};
-              background:${on ? 'var(--navy-700)' : 'var(--surface)'};color:${on ? '#fff' : 'inherit'}">
+            return `<button class="card" data-rel="${k}" style="text-align:left;cursor:pointer;border:1px solid ${on ? 'var(--ink-700)' : 'var(--line)'};
+              background:${on ? 'var(--ink-700)' : 'var(--surface)'};color:${on ? '#fff' : 'inherit'}">
               <div style="font-size:19px">${d.icone}</div>
               <div class="strong mt-sm" style="font-size:13.5px">${U.esc(d.nome)}</div>
               <div class="tiny ${on ? '' : 'muted'}" style="${on ? 'opacity:.82' : ''}">${U.esc(d.desc)}</div>
@@ -306,7 +306,7 @@
             <p>${U.esc(r.label)} · ${U.fmtDate(r.de)} a ${U.fmtDate(r.ate)} · emitido em ${U.fmtDate(U.today())}</p></div>
           <div class="hstack no-print">
             <button class="btn btn--sm btn--ghost" data-excel>📥 Exportar Excel</button>
-            <button class="btn btn--sm btn--navy" data-pdf>📄 Exportar PDF</button>
+            <button class="btn btn--sm btn--ink" data-pdf>📄 Exportar PDF</button>
           </div>
         </div>
         <div class="card__body">
@@ -325,7 +325,7 @@
             : UI.vazio({ icone: '📄', titulo: 'Sem dados no período', texto: 'Escolha outro período para gerar o relatório.' })}
         </div>
         <div class="card__foot tiny muted">
-          CRM Produtos · ${U.esc(Store.config.empresa)} · relatório gerado automaticamente a partir dos dados cadastrados.
+          CRM de Produtos da Firece · ${U.esc(Store.config.empresa)} · relatório gerado automaticamente a partir dos dados cadastrados.
         </div>
       </div>`;
     },

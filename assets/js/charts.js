@@ -5,7 +5,7 @@
 (function (global) {
   'use strict';
 
-  const PALETTE = ['#2563eb', '#7c3aed', '#059669', '#ea580c', '#0891b2', '#db2777', '#f0b429', '#1b3763'];
+  const PALETTE = ['#E8400D', '#2563eb', '#0E9F6E', '#7c3aed', '#D97706', '#0E8C9E', '#C4183C', '#3A2A20'];
   const AXIS = '#94a3b8';
   const GRID = '#e6eaf2';
   const TEXT = '#64748b';
@@ -85,9 +85,9 @@
     if (o.serieLinha) {
       const pts = data.map((d, i) => [x(i), y(d[o.serieLinha])]);
       const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-      s += `<path d="${path}" fill="none" stroke="#059669" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+      s += `<path d="${path}" fill="none" stroke="#047857" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
       pts.forEach((p, i) => {
-        s += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${n > 20 ? 2 : 3.4}" fill="#fff" stroke="#059669" stroke-width="2">`;
+        s += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${n > 20 ? 2 : 3.4}" fill="#fff" stroke="#047857" stroke-width="2">`;
         s += `<title>${esc(data[i].label)} — ${o.labelLinha}: ${U.money(data[i][o.serieLinha])}</title></circle>`;
       });
     }
@@ -96,7 +96,7 @@
     s += `<line x1="${pad.l}" y1="${pad.t + ih}" x2="${W - pad.r}" y2="${pad.t + ih}" stroke="${AXIS}" stroke-width="1"/>`;
 
     const defs = `<defs><linearGradient id="gradBar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs>`;
+      <stop offset="0%" stop-color="#F26522"/><stop offset="100%" stop-color="#C4350A"/></linearGradient></defs>`;
 
     return svg(W, H, defs + s, 'Gráfico de faturamento por período');
   }
@@ -177,7 +177,7 @@
     const dados = (stages || []).filter(s => s.etapa.aberto || s.etapa.ganho);
     if (!dados.length) return vazio('Sem oportunidades no funil.');
     const max = Math.max.apply(null, dados.map(d => d.valor || 0)) || 1;
-    const corMap = { blue: '#2563eb', purple: '#7c3aed', orange: '#f97316', gold: '#f0b429', green: '#10b981', red: '#ef4444' };
+    const corMap = { blue: '#2563eb', purple: '#7c3aed', orange: '#D97706', gold: '#EAB308', green: '#0E9F6E', red: '#C4183C', fire: '#E8400D' };
 
     return '<div class="vstack">' + dados.map((d, i) => {
       const pct = U.clamp(((d.valor || 0) / max) * 100, 2, 100);

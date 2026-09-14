@@ -43,19 +43,19 @@
   /* ---------------- configuração padrão ---------------- */
   function defaultConfig() {
     return {
-      empresa: 'Minha Empresa',
+      empresa: 'Firece',
       gestor: 'Gestor',
       moeda: 'BRL',
       metaFaturamentoMensal: 180000,
       metaVendasMensal: 25,
-      baseLinks: 'https://cadastro.minhaempresa.com.br/',
+      baseLinks: 'https://cadastro.firece.com.br/',
 
       categorias: [
-        { id: 'cat_saas', nome: 'SaaS / Assinatura', cor: '#2563eb' },
+        { id: 'cat_saas', nome: 'SaaS / Assinatura', cor: '#E8400D' },
         { id: 'cat_consult', nome: 'Consultoria', cor: '#7c3aed' },
-        { id: 'cat_treina', nome: 'Treinamento', cor: '#059669' },
-        { id: 'cat_licenca', nome: 'Licenciamento', cor: '#ea580c' },
-        { id: 'cat_servico', nome: 'Serviços', cor: '#0891b2' }
+        { id: 'cat_treina', nome: 'Treinamento', cor: '#0E9F6E' },
+        { id: 'cat_licenca', nome: 'Licenciamento', cor: '#D97706' },
+        { id: 'cat_servico', nome: 'Serviços', cor: '#0E8C9E' }
       ],
 
       tiposProduto: [

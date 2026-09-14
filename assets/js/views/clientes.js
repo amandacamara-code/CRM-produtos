@@ -72,7 +72,7 @@
           <h2>Base de clientes</h2>
           <div class="hstack">
             <button class="btn btn--sm btn--ghost" data-exportar>📥 Excel</button>
-            ${pode ? `<button class="btn btn--sm btn--gold" data-novo>＋ Novo Cliente</button>` : ''}
+            ${pode ? `<button class="btn btn--sm btn--fire" data-novo>＋ Novo Cliente</button>` : ''}
           </div>
         </div>
         <div class="card__body">
@@ -120,7 +120,7 @@
             },
             vazio: {
               icone: '👥', titulo: 'Nenhum cliente encontrado',
-              acao: pode ? `<button class="btn btn--gold" data-novo>＋ Novo Cliente</button>` : ''
+              acao: pode ? `<button class="btn btn--fire" data-novo>＋ Novo Cliente</button>` : ''
             }
           })}
         </div>

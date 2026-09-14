@@ -36,7 +36,7 @@
           <div class="hstack mt">
             ${p.link ? `<button class="btn btn--sm btn--blue" data-link-open="${U.esc(p.link)}">🔗 Abrir Cadastro</button>
                         <button class="btn btn--sm btn--ghost" data-link-qr="${U.esc(p.link)}" data-link-titulo="${U.esc(p.nome)}">⬛ Gerar QR Code</button>`
-                      : pode ? `<button class="btn btn--sm btn--gold" data-def="${p.id}">＋ Definir link</button>` : ''}
+                      : pode ? `<button class="btn btn--sm btn--fire" data-def="${p.id}">＋ Definir link</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -45,7 +45,7 @@
       <div class="grid grid--3 mb">
         ${UI.kpi({ icone: '🔗', titulo: 'Produtos com link', valor: U.num(comLink), cor: 'blue', sub: 'de ' + todos.length + ' produtos' })}
         ${UI.kpi({ icone: '⚠️', titulo: 'Sem link definido', valor: U.num(todos.length - comLink), cor: 'orange' })}
-        ${UI.kpi({ icone: '🌐', titulo: 'Domínio base', valor: `<span class="mono" style="font-size:13px">${U.esc(Store.config.baseLinks)}</span>`, cor: 'navy', sub: 'Configurável em Configurações' })}
+        ${UI.kpi({ icone: '🌐', titulo: 'Domínio base', valor: `<span class="mono" style="font-size:13px">${U.esc(Store.config.baseLinks)}</span>`, cor: 'ink', sub: 'Configurável em Configurações' })}
       </div>
 
       <div class="card mb">

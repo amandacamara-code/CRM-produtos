@@ -43,7 +43,7 @@
         ${UI.kpi({ icone: '📦', titulo: 'Produtos cadastrados', valor: U.num(res.total), cor: 'purple' })}
         ${UI.kpi({ icone: '🟢', titulo: 'Ativos', valor: U.num(res.ativos), cor: 'green' })}
         ${UI.kpi({ icone: '🟡', titulo: 'Inativos / em desenvolvimento', valor: U.num(res.inativos), cor: 'gold' })}
-        ${UI.kpi({ icone: '⚪', titulo: 'Arquivados', valor: U.num(res.arquivados), cor: 'navy' })}
+        ${UI.kpi({ icone: '⚪', titulo: 'Arquivados', valor: U.num(res.arquivados), cor: 'ink' })}
       </div>
 
       <div class="card card--pad0">
@@ -51,7 +51,7 @@
           <h2>Catálogo</h2>
           <div class="hstack">
             <button class="btn btn--sm btn--ghost" data-exportar>📥 Excel</button>
-            ${pode ? `<button class="btn btn--sm btn--gold" data-novo>＋ Novo Produto</button>` : ''}
+            ${pode ? `<button class="btn btn--sm btn--fire" data-novo>＋ Novo Produto</button>` : ''}
           </div>
         </div>
         <div class="card__body">
@@ -112,7 +112,7 @@
             vazio: {
               icone: '📦', titulo: 'Nenhum produto cadastrado',
               texto: 'Cadastre o primeiro produto para começar a registrar vendas.',
-              acao: pode ? `<button class="btn btn--gold" data-novo>＋ Novo Produto</button>` : ''
+              acao: pode ? `<button class="btn btn--fire" data-novo>＋ Novo Produto</button>` : ''
             }
           })}
         </div>

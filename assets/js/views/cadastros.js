@@ -49,7 +49,7 @@
         ${UI.kpi({ icone: '👥', titulo: 'Cadastros listados', valor: U.num(itens.length), cor: 'blue' })}
         ${UI.kpi({ icone: '🎯', titulo: 'Em aberto', valor: U.num(abertos.length), cor: 'orange', sub: U.money0(U.sum(abertos, o => o.valor)) })}
         ${UI.kpi({ icone: '💰', titulo: 'Valor total', valor: U.money0(total), cor: 'gold' })}
-        ${UI.kpi({ icone: '📊', titulo: 'Ticket médio', valor: U.money0(itens.length ? total / itens.length : 0), cor: 'navy' })}
+        ${UI.kpi({ icone: '📊', titulo: 'Ticket médio', valor: U.money0(itens.length ? total / itens.length : 0), cor: 'ink' })}
       </div>
 
       <div class="card card--pad0">
@@ -57,7 +57,7 @@
           <h2>Lista de cadastros</h2>
           <div class="hstack">
             <button class="btn btn--sm btn--ghost" data-exportar>📥 Excel</button>
-            ${pode ? `<button class="btn btn--sm btn--gold" data-novo>＋ Novo Cadastro</button>` : ''}
+            ${pode ? `<button class="btn btn--sm btn--fire" data-novo>＋ Novo Cadastro</button>` : ''}
           </div>
         </div>
         <div class="card__body">

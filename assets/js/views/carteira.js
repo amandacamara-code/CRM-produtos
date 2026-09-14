@@ -63,7 +63,7 @@
       return `
       <div class="grid grid--kpi mb">
         ${UI.kpi({
-          icone: '💼', titulo: 'Carteira Total', cor: 'navy', valor: U.money0(cart.total),
+          icone: '💼', titulo: 'Carteira Total', cor: 'ink', valor: U.money0(cart.total),
           linhas: [
             { label: 'Contratos ativos', valor: U.num(cart.contratos) },
             { label: 'Recorrente', valor: U.money0(cart.recorrente) },
@@ -97,7 +97,7 @@
           <div class="hstack">
             <button class="btn btn--sm btn--ghost" data-exportar>📥 Excel</button>
             <button class="btn btn--sm btn--ghost" data-pdf>📄 PDF</button>
-            ${pode ? `<button class="btn btn--sm btn--gold" data-nova>＋ Nova Venda</button>` : ''}
+            ${pode ? `<button class="btn btn--sm btn--fire" data-nova>＋ Nova Venda</button>` : ''}
           </div>
         </div>
         <div class="card__body">
@@ -215,7 +215,7 @@
       const nova = el.querySelector('[data-nova]');
       if (nova) nova.onclick = () => Forms.venda();
       const pdf = el.querySelector('[data-pdf]');
-      if (pdf) pdf.onclick = () => UI.exportarPDF('Carteira — CRM Produtos');
+      if (pdf) pdf.onclick = () => UI.exportarPDF('Carteira — CRM de Produtos da Firece');
 
       const exp = el.querySelector('[data-exportar]');
       if (exp) exp.onclick = () => {

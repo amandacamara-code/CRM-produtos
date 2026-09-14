@@ -143,7 +143,8 @@
       document.getElementById('pageTitle').textContent = view.titulo;
       document.getElementById('pageSubtitle').textContent = view.subtitulo || '';
       const nomeTela = view.titulo.replace(/^[^\wÀ-ſ]+/, '').trim();
-      document.title = nomeTela === 'CRM Produtos' ? nomeTela : nomeTela + ' · CRM Produtos';
+      const marca = 'CRM de Produtos da Firece';
+      document.title = nomeTela === marca ? marca : nomeTela + ' · Firece';
 
       const scroll = window.scrollY;
       try {
@@ -153,7 +154,7 @@
         alvo.innerHTML = UI.vazio({
           icone: '⚠️', titulo: 'Não foi possível carregar esta tela',
           texto: e.message,
-          acao: '<button class="btn btn--navy" onclick="location.reload()">Recarregar</button>'
+          acao: '<button class="btn btn--ink" onclick="location.reload()">Recarregar</button>'
         });
         return;
       }
@@ -209,7 +210,7 @@
       document.getElementById('view').innerHTML =
         `<div class="empty"><div class="empty__icon">⚠️</div>
           <h3>Erro ao iniciar o CRM</h3><p>${U.esc(e.message)}</p>
-          <button class="btn btn--navy" onclick="localStorage.removeItem('crm_produtos_v1');location.reload()">
+          <button class="btn btn--ink" onclick="localStorage.removeItem('crm_produtos_v1');location.reload()">
             Recarregar com dados de demonstração</button></div>`;
     }
   });

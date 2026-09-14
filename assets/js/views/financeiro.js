@@ -64,7 +64,7 @@
 
       <div class="grid grid--kpi mb">
         ${UI.kpi({
-          icone: '💰', titulo: 'Faturamento Bruto', cor: 'gold', valor: U.money0(fat.bruto),
+          icone: '💰', titulo: 'Faturamento Bruto', cor: 'fire', valor: U.money0(fat.bruto),
           sub: UI.trend(comp.deltaBruto) + ' <span class="muted">vs. período anterior</span>',
           linhas: [
             { label: 'Vendas', valor: U.num(fat.qtd) },
@@ -106,8 +106,8 @@
           <div class="card__body">
             ${Charts.faturamento(serie, { h: 250 })}
             <div class="chart-legend">
-              <span><i style="background:#2563eb"></i>Bruto</span>
-              <span><i style="background:#059669"></i>Líquido</span>
+              <span><i style="background:#E8400D"></i>Bruto</span>
+              <span><i style="background:#047857"></i>Líquido</span>
             </div>
           </div>
         </div>
@@ -117,11 +117,11 @@
             <p>Líquido = bruto − descontos − custos − comissões</p></div>
           <div class="card__body">
             ${Charts.waterfall([
-              { label: 'Faturamento bruto', valor: fat.bruto, cor: '#2563eb' },
-              { label: 'Descontos', valor: -fat.descontos, cor: '#f97316' },
-              { label: 'Custos', valor: -fat.custos, cor: '#ef4444' },
-              { label: 'Comissões', valor: -fat.comissoes, cor: '#8b5cf6' },
-              { label: 'Faturamento líquido', valor: fat.liquido, cor: '#10b981' }
+              { label: 'Faturamento bruto', valor: fat.bruto, cor: '#E8400D' },
+              { label: 'Descontos', valor: -fat.descontos, cor: '#D97706' },
+              { label: 'Custos', valor: -fat.custos, cor: '#C4183C' },
+              { label: 'Comissões', valor: -fat.comissoes, cor: '#7c3aed' },
+              { label: 'Faturamento líquido', valor: fat.liquido, cor: '#0E9F6E' }
             ])}
             <div class="divider"></div>
             <div class="spread"><span class="small muted">Margem do período</span>
@@ -137,7 +137,7 @@
           <div class="hstack no-print">
             <button class="btn btn--sm btn--ghost" data-exportar>📥 Excel</button>
             <button class="btn btn--sm btn--ghost" data-pdf>📄 PDF</button>
-            ${pode ? `<button class="btn btn--sm btn--gold" data-nova>＋ Nova Venda</button>` : ''}
+            ${pode ? `<button class="btn btn--sm btn--fire" data-nova>＋ Nova Venda</button>` : ''}
           </div>
         </div>
         <div class="card__body">
@@ -239,7 +239,7 @@
       const nova = el.querySelector('[data-nova]');
       if (nova) nova.onclick = () => Forms.venda();
       const pdf = el.querySelector('[data-pdf]');
-      if (pdf) pdf.onclick = () => UI.exportarPDF('Financeiro — CRM Produtos');
+      if (pdf) pdf.onclick = () => UI.exportarPDF('Financeiro — CRM de Produtos da Firece');
 
       const exp = el.querySelector('[data-exportar]');
       if (exp) exp.onclick = () => {

@@ -70,13 +70,13 @@
     statusProduto: { titulo: '📦 Status de produto', campos: [
       { name: 'nome', label: 'Nome', obrigatorio: true },
       { name: 'emoji', label: 'Emoji' },
-      { name: 'cor', label: 'Cor', tipo: 'select', opcoes: ['green', 'red', 'gold', 'blue', 'purple', 'orange', 'gray', 'navy'] },
+      { name: 'cor', label: 'Cor', tipo: 'select', opcoes: ['fire', 'green', 'red', 'gold', 'blue', 'purple', 'orange', 'gray', 'ink'] },
       { name: 'ativo', label: 'Conta como ativo', tipo: 'checkbox' },
       { name: 'arquivado', label: 'Arquivado', tipo: 'checkbox' }] },
     etapas: { titulo: '🎯 Etapas do funil', campos: [
       { name: 'nome', label: 'Nome', obrigatorio: true },
       { name: 'emoji', label: 'Emoji' },
-      { name: 'cor', label: 'Cor', tipo: 'select', opcoes: ['blue', 'purple', 'orange', 'gold', 'green', 'red', 'gray', 'navy'] },
+      { name: 'cor', label: 'Cor', tipo: 'select', opcoes: ['blue', 'purple', 'orange', 'gold', 'green', 'red', 'fire', 'gray', 'ink'] },
       { name: 'ordem', label: 'Ordem', tipo: 'number' },
       { name: 'aberto', label: 'Conta no pipeline', tipo: 'checkbox' },
       { name: 'ganho', label: 'Gera venda (ganho)', tipo: 'checkbox' },
@@ -115,7 +115,7 @@
       const form = U.el(`<form class="vstack">${UI.campo({ label: 'Nome', name: 'nome', valor: atual, obrigatorio: true })}</form>`);
       const m = UI.modal({
         titulo: def.titulo, tamanho: 'sm', corpo: form,
-        rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--gold" data-ok>💾 Salvar</button>`
+        rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--fire" data-ok>💾 Salvar</button>`
       });
       m.foot.querySelector('[data-ok]').onclick = () => {
         const v = form.elements.nome.value.trim();
@@ -150,7 +150,7 @@
     const form = U.el(`<form class="formgrid">${campos}</form>`);
     const m = UI.modal({
       titulo: (id ? 'Editar' : 'Adicionar') + ' — ' + def.titulo, tamanho: 'sm', corpo: form,
-      rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--gold" data-ok>💾 Salvar</button>`
+      rodape: `<button class="btn btn--soft" data-close>Cancelar</button><button class="btn btn--fire" data-ok>💾 Salvar</button>`
     });
     m.foot.querySelector('[data-ok]').onclick = () => {
       const f = UI.lerForm(form);
@@ -176,7 +176,7 @@
           ${UI.campo({ label: 'Meta de vendas no mês', name: 'metaVendasMensal', tipo: 'number', valor: c.metaVendasMensal, attrs: 'step="1" min="0"' })}
           ${UI.campo({ label: 'Domínio base dos links de cadastro', name: 'baseLinks', valor: c.baseLinks, full: true, hint: 'Usado ao gerar automaticamente os links dos produtos.' })}
         </form>
-        ${pode ? `<button class="btn btn--gold mt" data-salvar-geral>💾 Salvar configurações</button>`
+        ${pode ? `<button class="btn btn--fire mt" data-salvar-geral>💾 Salvar configurações</button>`
                : `<div class="notice mt">🔒 Seu perfil não permite alterar as configurações.</div>`}
       </div>
     </div>`;
@@ -190,7 +190,7 @@
       <div class="card card--pad0 mb">
         <div class="card__head">
           <div><h3>📦 Produtos cadastrados</h3><p>${produtos.length} produto(s)</p></div>
-          ${pode ? `<button class="btn btn--sm btn--gold" data-novo-produto>＋ Adicionar Produto</button>` : ''}
+          ${pode ? `<button class="btn btn--sm btn--fire" data-novo-produto>＋ Adicionar Produto</button>` : ''}
         </div>
         <div class="card__body">
           ${produtos.length ? `<div class="vstack">${produtos.map(p => `
@@ -221,18 +221,18 @@
       <div class="card card--pad0 mb">
         <div class="card__head">
           <div><h3>👤 Usuários</h3><p>Perfis definem o que cada pessoa enxerga e pode editar</p></div>
-          ${pode ? `<button class="btn btn--sm btn--gold" data-novo-usuario>＋ Novo Usuário</button>` : ''}
+          ${pode ? `<button class="btn btn--sm btn--fire" data-novo-usuario>＋ Novo Usuário</button>` : ''}
         </div>
         <div class="card__body">
           <div class="vstack">
             ${usuarios.map(u => `
               <div class="spread" style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;
-                ${u.id === atual.id ? 'border-color:var(--navy-500);background:var(--surface-2)' : ''}">
+                ${u.id === atual.id ? 'border-color:var(--ink-500);background:var(--surface-2)' : ''}">
                 <div class="hstack" style="min-width:0">
                   ${UI.avatar(u.nome, 34)}
                   <div>
                     <div class="strong" style="font-size:13.5px">${U.esc(u.nome)}
-                      ${u.id === atual.id ? '<span class="badge badge--navy">você</span>' : ''}</div>
+                      ${u.id === atual.id ? '<span class="badge badge--ink">você</span>' : ''}</div>
                     <div class="tiny muted">${U.esc(u.email)}${u.cargo ? ' · ' + U.esc(u.cargo) : ''}</div>
                   </div>
                 </div>

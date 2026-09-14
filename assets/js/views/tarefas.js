@@ -83,7 +83,7 @@
             <option value="prazo" ${estado.agrupar === 'prazo' ? 'selected' : ''}>Agrupar por prazo</option>
             <option value="status" ${estado.agrupar === 'status' ? 'selected' : ''}>Agrupar por status</option>
           </select>
-          ${pode ? `<button class="btn btn--sm btn--gold" data-nova style="margin-left:auto">＋ Nova Tarefa</button>` : ''}
+          ${pode ? `<button class="btn btn--sm btn--fire" data-nova style="margin-left:auto">＋ Nova Tarefa</button>` : ''}
         </div>
       </div>
 
@@ -95,7 +95,7 @@
         UI.vazio({
           icone: '✅', titulo: 'Nenhuma tarefa encontrada',
           texto: 'Crie tarefas para acompanhar propostas, follow-ups e renovações.',
-          acao: pode ? `<button class="btn btn--gold" data-nova>＋ Nova Tarefa</button>` : ''
+          acao: pode ? `<button class="btn btn--fire" data-nova>＋ Nova Tarefa</button>` : ''
         })}`;
     },
 

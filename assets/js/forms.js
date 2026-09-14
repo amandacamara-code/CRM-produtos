@@ -79,7 +79,7 @@
       subtitulo: novo ? 'Cadastre um produto sem precisar alterar o código do sistema.' : U.esc(d.nome),
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar produto</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar produto</button>`
     });
 
     function atualizarMargem() {
@@ -180,7 +180,7 @@
       subtitulo: novo ? 'O registro entra no funil e alimenta os indicadores automaticamente.' : U.esc(d.nome),
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar cadastro</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar cadastro</button>`
     });
 
     // sugere o valor a partir do preço do produto
@@ -311,7 +311,7 @@
       subtitulo: 'Os totais de faturamento, carteira e comissões são recalculados na hora.',
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Registrar venda</button>`
+               <button class="btn btn--fire" data-salvar>💾 Registrar venda</button>`
     });
 
     function recalcular() {
@@ -408,7 +408,7 @@
       titulo: novo ? '👥 Novo Cliente' : '✏️ Editar Cliente',
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar</button>`
     });
 
     m.foot.querySelector('[data-salvar]').onclick = () => {
@@ -455,7 +455,7 @@
       titulo: novo ? '✅ Nova Tarefa' : '✏️ Editar Tarefa',
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar</button>`
     });
 
     m.foot.querySelector('[data-salvar]').onclick = () => {
@@ -499,7 +499,7 @@
       titulo: novo ? '👤 Novo Usuário' : '✏️ Editar Usuário',
       corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar</button>`
     });
 
     const desc = form.querySelector('#perfilDesc');
@@ -581,7 +581,7 @@
       rodape: `<button class="btn btn--soft" data-close>Fechar</button>
         ${pode ? `<button class="btn btn--ghost" data-duplicar>⧉ Duplicar</button>
                   <button class="btn btn--ghost" data-venda>💰 Nova venda</button>
-                  <button class="btn btn--navy" data-editar>✏️ Editar</button>` : ''}`
+                  <button class="btn btn--ink" data-editar>✏️ Editar</button>` : ''}`
     });
 
     const qs = s => m.el.querySelector(s);
@@ -617,7 +617,7 @@
       titulo: '🔗 Link de cadastro', subtitulo: U.esc(p.nome), tamanho: 'sm', corpo: form,
       rodape: `<button class="btn btn--soft" data-close>Cancelar</button>
                <button class="btn btn--ghost" data-sugerir>✨ Gerar automático</button>
-               <button class="btn btn--gold" data-salvar>💾 Salvar</button>`
+               <button class="btn btn--fire" data-salvar>💾 Salvar</button>`
     });
     m.foot.querySelector('[data-sugerir]').onclick = () => {
       form.elements.link.value = cfg().baseLinks + U.slug(p.nome);
@@ -688,7 +688,7 @@
       corpo: corpo,
       rodape: `<button class="btn btn--soft" data-close>Fechar</button>
         ${pode ? `<button class="btn btn--ghost" data-tarefa>✅ Nova tarefa</button>
-                  <button class="btn btn--navy" data-editar>✏️ Editar</button>` : ''}`
+                  <button class="btn btn--ink" data-editar>✏️ Editar</button>` : ''}`
     });
 
     if (pode) {
@@ -757,7 +757,7 @@
       corpo: corpo,
       rodape: `<button class="btn btn--soft" data-close>Fechar</button>
         ${pode ? `<button class="btn btn--ghost" data-venda>💰 Nova venda</button>
-                  <button class="btn btn--navy" data-editar>✏️ Editar</button>` : ''}`
+                  <button class="btn btn--ink" data-editar>✏️ Editar</button>` : ''}`
     });
     if (pode) {
       m.el.querySelector('[data-editar]').onclick = () => { m.close(); cliente(c.id); };

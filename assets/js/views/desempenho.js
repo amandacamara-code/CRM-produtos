@@ -123,7 +123,7 @@
           <div class="card__head"><h2>📈 Margem por produto</h2></div>
           <div class="card__body">
             ${Charts.hbars(U.sortBy(arr.filter(d => d.vendasQtd > 0), d => d.margemPct, 'desc').slice(0, 8)
-              .map(d => ({ label: d.produto.nome, valor: d.margemPct, cor: d.margemPct >= 30 ? '#059669' : d.margemPct >= 15 ? '#f0b429' : '#ef4444' })),
+              .map(d => ({ label: d.produto.nome, valor: d.margemPct, cor: d.margemPct >= 30 ? '#047857' : d.margemPct >= 15 ? '#D97706' : '#C4183C' })),
               { formato: v => U.pct(v) })}
           </div>
         </div>
