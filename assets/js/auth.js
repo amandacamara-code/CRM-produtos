@@ -93,6 +93,83 @@
     el.querySelector('[data-criar]').onclick = () => criarConta(aoEntrar);
   }
 
+  /* ---------------- entrar no modo local (sem servidor) ----------------
+     Mesmo desenho do login real, para a experiência ser a mesma. A
+     diferença é dita com todas as letras na tela: aqui não há proteção,
+     porque não existe servidor para verificar nada. ------------------- */
+  const CHAVE_SESSAO_LOCAL = 'crm_firece_sessao_local';
+
+  function sessaoLocal() {
+    try { return localStorage.getItem(CHAVE_SESSAO_LOCAL) || null; } catch (e) { return null; }
+  }
+  function guardarSessaoLocal(id) {
+    try { localStorage.setItem(CHAVE_SESSAO_LOCAL, id); } catch (e) { /* modo privado */ }
+  }
+  function limparSessaoLocal() {
+    try { localStorage.removeItem(CHAVE_SESSAO_LOCAL); } catch (e) { /* noop */ }
+  }
+
+  function entrarLocal(aoEntrar) {
+    const contas = Store.list('usuarios').filter(u => u.ativo !== false);
+
+    const el = tela(`
+      <h1>Entrar</h1>
+      <p class="login__sub">Acesse o CRM de Produtos da Firece.</p>
+      <form class="vstack" id="formLocal" novalidate>
+        <div class="field"><label for="loEmail">E-mail</label>
+          <input class="input" type="email" id="loEmail" autocomplete="username"
+                 placeholder="seu@firece.com.br" required></div>
+        <div class="field"><label for="loSenha">Senha</label>
+          <input class="input" type="password" id="loSenha" autocomplete="current-password"
+                 placeholder="Sua senha" required></div>
+        <p class="error-msg" data-erro hidden></p>
+        <button class="btn btn--fire btn--block" type="submit">Entrar</button>
+      </form>
+
+      <div class="login__demo">
+        <div class="login__demo-titulo">Modo demonstração</div>
+        <p>Ainda <b>não há servidor conectado</b>: os dados ficam só neste navegador e
+          esta senha não protege nada — qualquer senha entra. A proteção de verdade
+          começa ao conectar o servidor, em Configurações → Conexão e equipe.</p>
+        <div class="login__contas">
+          ${contas.map(u => `<button type="button" class="login__conta" data-conta="${U.esc(u.id)}">
+            <span>${U.esc(u.nome)}</span>
+            <small>${U.esc((Store.PERFIS[u.perfil] || {}).nome || u.perfil)}</small>
+          </button>`).join('')}
+        </div>
+      </div>`);
+
+    const form = el.querySelector('#formLocal');
+    const campoEmail = form.querySelector('#loEmail');
+
+    el.querySelectorAll('[data-conta]').forEach(b => {
+      b.onclick = () => {
+        const u = Store.get('usuarios', b.getAttribute('data-conta'));
+        if (!u) return;
+        campoEmail.value = u.email || '';
+        form.querySelector('#loSenha').focus();
+      };
+    });
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      const email = campoEmail.value.trim().toLowerCase();
+      const senha = form.querySelector('#loSenha').value;
+      if (!email) return erro(el, 'Informe o e-mail.');
+      if (!senha) return erro(el, 'Informe a senha.');
+
+      const u = Store.list('usuarios').find(x => String(x.email || '').toLowerCase() === email);
+      if (!u) return erro(el, 'Não existe conta com este e-mail. Toque em um dos acessos abaixo para preencher.');
+      if (u.ativo === false) return erro(el, 'Esta conta está inativa.');
+
+      erro(el, '');
+      guardarSessaoLocal(u.id);
+      Store.setUser(u.id);
+      fechar();
+      aoEntrar(u);
+    };
+  }
+
   /* ---------------- criar conta ---------------- */
   function criarConta(aoEntrar) {
     const el = tela(`
@@ -240,5 +317,8 @@
       <div class="login__barra"><span></span></div>`);
   }
 
-  global.Auth = { entrar, criarConta, esqueci, novaSenha, aguardandoLiberacao, falhaConexao, carregando, fechar, aviso };
+  global.Auth = {
+    entrar, criarConta, esqueci, novaSenha, aguardandoLiberacao, falhaConexao, carregando, fechar, aviso,
+    entrarLocal, sessaoLocal, guardarSessaoLocal, limparSessaoLocal
+  };
 })(window);

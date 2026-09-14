@@ -124,9 +124,12 @@ uns 15 minutos, uma vez só. O SQL pronto está em `supabase/schema.sql`.
 | **Consultor / Vendedor** | Apenas os próprios clientes, leads, vendas e tarefas |
 | **Visualizador** | Somente leitura |
 
-No modo local, o seletor no rodapé do menu troca o usuário ativo, para você ver
-como cada perfil enxerga o sistema. No modo equipe esse seletor some: quem você é
-vem do login, e o bloqueio passa a ser do banco de dados.
+**A entrada do sistema é sempre a tela de login**, nos dois modos.
+
+No modo local ela é uma simulação — a própria tela avisa que qualquer senha entra
+e que os dados ficam só no navegador — e serve para você percorrer o sistema como
+cada perfil, escolhendo a conta na lista. No modo equipe ela vira autenticação de
+verdade, e o bloqueio passa a ser do banco de dados.
 
 ---
 

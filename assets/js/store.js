@@ -695,12 +695,12 @@
 
     /* --- usuários --- */
     const usuarios = [
-      { id: 'usr_admin', nome: 'Marina Prado', email: 'marina.prado@empresa.com.br', perfil: 'admin', cargo: 'Head de Produtos', ativo: true },
-      { id: 'usr_gestor', nome: 'Rafael Lima', email: 'rafael.lima@empresa.com.br', perfil: 'gestor', cargo: 'Gestor de Produtos', ativo: true },
-      { id: 'usr_c1', nome: 'Bianca Torres', email: 'bianca.torres@empresa.com.br', perfil: 'consultor', cargo: 'Consultora de Vendas', ativo: true },
-      { id: 'usr_c2', nome: 'Diego Ramos', email: 'diego.ramos@empresa.com.br', perfil: 'consultor', cargo: 'Consultor de Vendas', ativo: true },
-      { id: 'usr_c3', nome: 'Carla Menezes', email: 'carla.menezes@empresa.com.br', perfil: 'consultor', cargo: 'Consultora de Vendas', ativo: true },
-      { id: 'usr_leitor', nome: 'Paulo Diretoria', email: 'paulo@empresa.com.br', perfil: 'leitor', cargo: 'Diretor', ativo: true }
+      { id: 'usr_admin', nome: 'Marina Prado', email: 'marina.prado@firece.com.br', perfil: 'admin', cargo: 'Head de Produtos', ativo: true },
+      { id: 'usr_gestor', nome: 'Rafael Lima', email: 'rafael.lima@firece.com.br', perfil: 'gestor', cargo: 'Gestor de Produtos', ativo: true },
+      { id: 'usr_c1', nome: 'Bianca Torres', email: 'bianca.torres@firece.com.br', perfil: 'consultor', cargo: 'Consultora de Vendas', ativo: true },
+      { id: 'usr_c2', nome: 'Diego Ramos', email: 'diego.ramos@firece.com.br', perfil: 'consultor', cargo: 'Consultor de Vendas', ativo: true },
+      { id: 'usr_c3', nome: 'Carla Menezes', email: 'carla.menezes@firece.com.br', perfil: 'consultor', cargo: 'Consultora de Vendas', ativo: true },
+      { id: 'usr_leitor', nome: 'Paulo Diretoria', email: 'paulo@firece.com.br', perfil: 'leitor', cargo: 'Diretor', ativo: true }
     ];
     base.usuarios = usuarios;
     base.meta.usuarioAtivo = 'usr_admin';

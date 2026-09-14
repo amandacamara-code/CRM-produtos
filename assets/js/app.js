@@ -54,6 +54,16 @@
         if (!ok) return;           // a tela de login assume daqui
       } else {
         Store.load();
+        // sem servidor o login também vem primeiro, para a entrada do
+        // sistema ser sempre a mesma
+        const sessao = Auth.sessaoLocal();
+        const usuario = sessao ? Store.get('usuarios', sessao) : null;
+        if (!usuario || usuario.ativo === false) {
+          Auth.limparSessaoLocal();
+          Auth.entrarLocal(() => this.montarTela());
+          return;
+        }
+        Store.setUser(usuario.id);
       }
       this.montarTela();
     },
@@ -245,34 +255,20 @@
       av.textContent = U.initials(u.nome);
       av.style.background = U.colorFor(u.nome);
 
-      const sel = document.getElementById('userSwitch');
-      const areaTroca = document.getElementById('userSwitchArea');
-
-      if (Store.modo() === 'nuvem') {
-        // a identidade vem do login: trocar de usuário deixa de fazer sentido
-        areaTroca.innerHTML = `<button class="btn btn--sm btn--ghost btn--block" id="btnSair">Sair da conta</button>`;
-        document.getElementById('btnSair').onclick = async () => {
-          const ok = await UI.confirmar({
-            titulo: 'Sair da conta', confirmar: 'Sair',
-            mensagem: 'Você precisará entrar de novo com e-mail e senha.'
-          });
-          if (!ok) return;
-          await Backend.sair();
-          location.reload();
-        };
-        return;
-      }
-
-      sel.innerHTML = Store.list('usuarios').filter(x => x.ativo !== false)
-        .map(x => `<option value="${x.id}" ${x.id === u.id ? 'selected' : ''}>${U.esc(x.nome)} · ${U.esc((Store.PERFIS[x.perfil] || {}).nome || '')}</option>`).join('');
-      sel.onchange = e => {
-        Store.setUser(e.target.value);
-        this.montarUsuario();
-        if (!Store.podeVer(this.rota)) this.rota = 'dashboard';
-        this.montarNav();
-        this.render();
-        const novo = Store.currentUser();
-        UI.toast('Acessando como ' + novo.nome + ' (' + (Store.PERFIS[novo.perfil] || {}).nome + ').', 'info', 3600);
+      // Quem está usando vem do login, nos dois modos. Um seletor de
+      // usuário aqui deixaria o login sem propósito, então o rodapé
+      // oferece apenas a saída.
+      document.getElementById('userSwitchArea').innerHTML =
+        `<button class="btn btn--sm btn--ghost btn--block" id="btnSair">Sair da conta</button>`;
+      document.getElementById('btnSair').onclick = async () => {
+        const ok = await UI.confirmar({
+          titulo: 'Sair da conta', confirmar: 'Sair',
+          mensagem: 'Você precisará entrar de novo com e-mail e senha.'
+        });
+        if (!ok) return;
+        if (Store.modo() === 'nuvem') await Backend.sair();
+        Auth.limparSessaoLocal();
+        location.reload();
       };
     },
 
