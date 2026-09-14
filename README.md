@@ -100,6 +100,21 @@ na ordem definida, já contando no pipeline — sem tocar em uma linha de códig
 
 ---
 
+## Dois modos de funcionamento
+
+O sistema roda de duas formas, com a **mesma interface**:
+
+| | **Local** (padrão) | **Equipe** (com login) |
+|---|---|---|
+| Onde ficam os dados | Navegador de quem abre | Supabase (Postgres) |
+| Login | Não tem — seletor de perfil para teste | E-mail e senha |
+| Compartilhar | Não — cada aparelho tem sua base | Sim — todos na mesma base |
+| Permissões | Só escondem botões na tela | **Regras do banco**, valem por fora da tela |
+| Tempo real | — | Alteração de um aparece no de todos |
+
+Para ligar o modo equipe: **[docs/CONFIGURAR-LOGIN.md](docs/CONFIGURAR-LOGIN.md)** —
+uns 15 minutos, uma vez só. O SQL pronto está em `supabase/schema.sql`.
+
 ## Perfis de acesso
 
 | Perfil | Acesso |
@@ -109,8 +124,9 @@ na ordem definida, já contando no pipeline — sem tocar em uma linha de códig
 | **Consultor / Vendedor** | Apenas os próprios clientes, leads, vendas e tarefas |
 | **Visualizador** | Somente leitura |
 
-O seletor no rodapé do menu lateral troca o usuário ativo — o menu, os dados e os
-botões de ação se ajustam ao perfil.
+No modo local, o seletor no rodapé do menu troca o usuário ativo, para você ver
+como cada perfil enxerga o sistema. No modo equipe esse seletor some: quem você é
+vem do login, e o bloqueio passa a ser do banco de dados.
 
 ---
 
@@ -119,12 +135,15 @@ botões de ação se ajustam ao perfil.
 `usuarios` · `produtos` · `clientes` · `oportunidades` · `vendas` · `tarefas`,
 mais a árvore `config` com todas as listas editáveis.
 
-Os dados ficam no **localStorage** do navegador — nada é enviado a nenhum servidor.
-Para migrar de máquina, use o backup JSON em Configurações.
+No modo local, os dados ficam no **localStorage** do navegador. No modo equipe, em
+tabelas do Supabase, onde cada registro guarda o objeto inteiro num campo `jsonb` —
+o que permite ao gestor criar status, categorias e campos novos pela tela, sem
+nenhuma migração de banco.
 
-Para ligar a um banco real (PostgreSQL, Firebase, Supabase…), o ponto de troca é
-`assets/js/store.js`: as funções `load`, `save`, `list`, `get`, `upsert` e `remove`
-concentram toda a persistência. O restante do sistema não conhece o meio de armazenamento.
+As telas continuam **síncronas** nos dois modos: a memória é sempre a fonte de
+leitura, e a gravação sobe em segundo plano. Se o servidor recusar (perfil sem
+permissão, sessão expirada, rede fora), a alteração local é **desfeita** e o
+sistema avisa — a tela nunca mostra um dado que o servidor não aceitou.
 
 ---
 
@@ -136,7 +155,12 @@ Sem framework, sem build, sem dependências externas — abre direto do disco e 
 index.html
 assets/css/style.css            Design system da marca Firece (mobile first)
 assets/img/firece-mark.svg      Símbolo da marca, usado no menu e no favicon
+supabase/schema.sql             Tabelas, permissões (RLS) e criação de perfil no cadastro
+docs/CONFIGURAR-LOGIN.md        Passo a passo para ligar o login e liberar o time
 assets/js/
+  firece-config.js              Onde entram a URL e a chave do Supabase
+  backend.js                    Login e sincronização com o servidor
+  auth.js                       Telas de entrar, criar conta e liberação de acesso
   util.js                       Formatação (R$, datas pt-BR), períodos, exportação CSV
   qrcode.js                     Gerador de QR Code próprio (modo byte, nível M, v1–12)
   store.js                      Modelo de dados, persistência, permissões e regras automáticas

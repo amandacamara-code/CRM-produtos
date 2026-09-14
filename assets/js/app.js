@@ -44,9 +44,142 @@
     rota: 'dashboard',
 
     /* ---------------- inicialização ---------------- */
-    iniciar() {
-      Store.load();
+    /**
+     * Com conexão configurada, exige login e carrega do servidor.
+     * Sem conexão, funciona local, como antes.
+     */
+    async iniciar() {
+      if (global.Backend && Backend.configurado()) {
+        const ok = await this.iniciarNaNuvem();
+        if (!ok) return;           // a tela de login assume daqui
+      } else {
+        Store.load();
+      }
+      this.montarTela();
+    },
 
+    async iniciarNaNuvem() {
+      const seguirLocal = () => { Store.load(); this.montarTela(); };
+      try {
+        Auth.carregando('Conectando…');
+        const logado = await Backend.iniciar();
+
+        // volta do e-mail de recuperação de senha
+        if (/type=recovery/.test(location.hash)) {
+          Auth.novaSenha(() => this.entrarNaNuvem());
+          return false;
+        }
+        if (!logado) {
+          Auth.entrar(() => this.entrarNaNuvem());
+          return false;
+        }
+        return await this.entrarNaNuvem(true);
+      } catch (e) {
+        console.error(e);
+        Auth.falhaConexao(e.message, seguirLocal);
+        return false;
+      }
+    },
+
+    /** Já autenticado: confere liberação, baixa os dados e monta a tela. */
+    async entrarNaNuvem(jaMontando) {
+      try {
+        Auth.carregando('Carregando seus dados…');
+        if (!Backend.meuPerfil()) await Backend.carregarPerfil();
+        const perfil = Backend.meuPerfil();
+
+        if (!perfil) {
+          Auth.aviso('Conta sem perfil de acesso',
+            'Sua conta existe, mas não tem perfil no CRM. Peça a um administrador para liberar o acesso.',
+            async () => { await Backend.sair(); Auth.entrar(() => this.entrarNaNuvem()); });
+          return false;
+        }
+        if (!perfil.ativo) {
+          Auth.aguardandoLiberacao(perfil, () => Auth.entrar(() => this.entrarNaNuvem()));
+          return false;
+        }
+
+        let dados = await Backend.carregarTudo();
+
+        // primeira conexão: sobe o que estava neste navegador
+        if (sessionStorage.getItem('crm_firece_migrar') === '1') {
+          sessionStorage.removeItem('crm_firece_migrar');
+          // 'usuarios' fica de fora: a conta de quem está migrando sempre existe
+          const vazio = Backend.TABELAS_JSON.every(c => !(dados[c] || []).length);
+          if (vazio && perfil.perfil === 'admin') {
+            Auth.carregando('Enviando seus dados para o servidor…');
+            await this.migrarBaseLocal(perfil);
+            dados = await Backend.carregarTudo();
+          }
+        }
+
+        Store.hidratarDaNuvem(dados, perfil);
+        this.ligarTempoReal();
+        Auth.fechar();
+        if (!jaMontando) this.montarTela();
+        return true;
+      } catch (e) {
+        console.error(e);
+        Auth.falhaConexao(e.message, () => { Store.load(); this.montarTela(); });
+        return false;
+      }
+    },
+
+    /**
+     * Envia a base local para o servidor na primeira conexão.
+     * Todo registro passa a ter como responsável quem está migrando,
+     * porque os usuários de demonstração não têm login de verdade.
+     */
+    async migrarBaseLocal(perfil) {
+      let local = null;
+      try {
+        const raw = localStorage.getItem('crm_produtos_v1');
+        if (raw) local = JSON.parse(raw);
+      } catch (e) { /* sem base local */ }
+      if (!local) return;
+
+      const mapa = {};
+      (local.usuarios || []).forEach(u => { mapa[u.id] = perfil.id; });
+      try {
+        const relatorio = await Backend.migrarParaNuvem(local, mapa);
+        const total = Object.keys(relatorio).reduce((t, k) => t + (relatorio[k] || 0), 0);
+        setTimeout(() => UI.toast('✅ ' + U.num(total) + ' registros enviados para o servidor.', 'ok', 6000), 900);
+      } catch (e) {
+        console.error(e);
+        setTimeout(() => UI.toast('Alguns dados não subiram: ' + e.message, 'err', 9000), 900);
+      }
+    },
+
+    /** Mudanças feitas por outra pessoa entram na tela sozinhas. */
+    ligarTempoReal() {
+      Backend.ouvirMudancas((tabela, carga) => {
+        try {
+          if (tabela === 'configuracoes') {
+            Store.aplicarConfigRemota(carga.new && carga.new.dados);
+          } else if (tabela === 'usuarios') {
+            const u = carga.new;
+            if (carga.eventType === 'DELETE') {
+              Store.aplicarMudancaRemota('usuarios', carga.old, true);
+            } else if (u) {
+              Store.aplicarMudancaRemota('usuarios', {
+                id: u.id, nome: u.nome, email: u.email, cargo: u.cargo || '',
+                perfil: u.perfil, ativo: u.ativo
+              });
+            }
+          } else {
+            if (carga.eventType === 'DELETE') {
+              Store.aplicarMudancaRemota(tabela, carga.old, true);
+            } else if (carga.new) {
+              Store.aplicarMudancaRemota(tabela,
+                Object.assign({}, carga.new.dados, { id: carga.new.id }));
+            }
+          }
+          this.render();
+        } catch (e) { console.error('mudança remota', e); }
+      });
+    },
+
+    montarTela() {
       // rota da URL (#/produtos)
       const inicial = (location.hash || '').replace(/^#\/?/, '');
       if (inicial && Views[inicial]) this.rota = inicial;
@@ -64,6 +197,11 @@
 
       Store.on('storage-error', () => {
         UI.toast('Não foi possível salvar no navegador (armazenamento cheio ou bloqueado).', 'err', 6000);
+      });
+
+      Store.on('sync-error', info => {
+        UI.toast(info.mensagem, 'err', 7000);
+        this.render();
       });
     },
 
@@ -108,6 +246,23 @@
       av.style.background = U.colorFor(u.nome);
 
       const sel = document.getElementById('userSwitch');
+      const areaTroca = document.getElementById('userSwitchArea');
+
+      if (Store.modo() === 'nuvem') {
+        // a identidade vem do login: trocar de usuário deixa de fazer sentido
+        areaTroca.innerHTML = `<button class="btn btn--sm btn--ghost btn--block" id="btnSair">Sair da conta</button>`;
+        document.getElementById('btnSair').onclick = async () => {
+          const ok = await UI.confirmar({
+            titulo: 'Sair da conta', confirmar: 'Sair',
+            mensagem: 'Você precisará entrar de novo com e-mail e senha.'
+          });
+          if (!ok) return;
+          await Backend.sair();
+          location.reload();
+        };
+        return;
+      }
+
       sel.innerHTML = Store.list('usuarios').filter(x => x.ativo !== false)
         .map(x => `<option value="${x.id}" ${x.id === u.id ? 'selected' : ''}>${U.esc(x.nome)} · ${U.esc((Store.PERFIS[x.perfil] || {}).nome || '')}</option>`).join('');
       sel.onchange = e => {
@@ -204,7 +359,10 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     try {
-      App.iniciar();
+      Promise.resolve(App.iniciar()).catch(e => {
+        console.error(e);
+        UI.toast('Erro ao iniciar: ' + e.message, 'err', 8000);
+      });
     } catch (e) {
       console.error(e);
       document.getElementById('view').innerHTML =

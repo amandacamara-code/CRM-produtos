@@ -1,6 +1,15 @@
 /* =========================================================
    store.js — modelo de dados, persistência e regras
-   Persistência: localStorage (chave crm_produtos_v1)
+
+   Dois modos de persistência, com a MESMA interface síncrona
+   para as telas (elas não sabem qual está ativo):
+     'local' — localStorage, um aparelho só
+     'nuvem' — Supabase, com login e permissões no servidor
+
+   No modo nuvem a memória é a fonte de leitura (as telas
+   continuam síncronas) e cada gravação sobe para o servidor em
+   segundo plano. Um erro de permissão desfaz a alteração local
+   e avisa quem está usando.
    ========================================================= */
 (function (global) {
   'use strict';
@@ -148,6 +157,7 @@
 
   /* ---------------- estado ---------------- */
   let db = null;
+  let modo = 'local';           // 'local' | 'nuvem'
   const listeners = {};
 
   function emit(evt, payload) {
@@ -169,10 +179,55 @@
       localStorage.setItem(KEY, JSON.stringify(db));
       return true;
     } catch (e) {
-      console.error('Falha ao salvar', e);
-      emit('storage-error', e);
+      // no modo nuvem o localStorage é só cache: estourar a cota não é erro fatal
+      if (modo === 'local') {
+        console.error('Falha ao salvar', e);
+        emit('storage-error', e);
+      }
       return false;
     }
+  }
+
+  /* ---------------- ponte com o servidor ---------------- */
+  /**
+   * Sobe uma alteração para o Supabase. Se o servidor recusar
+   * (perfil sem permissão, sessão expirada, sem internet), desfaz
+   * a alteração local e avisa, para a tela nunca mostrar um dado
+   * que o servidor não aceitou.
+   */
+  function sincronizar(acao, colecao, item, anterior) {
+    if (modo !== 'nuvem' || !global.Backend) return;
+    const promessa = acao === 'excluir'
+      ? Backend.excluir(colecao, item)
+      : Backend.salvar(colecao, item);
+    promessa.catch(err => {
+      desfazer(acao, colecao, item, anterior);
+      emit('sync-error', { acao, colecao, mensagem: err.message });
+    });
+  }
+
+  function desfazer(acao, colecao, item, anterior) {
+    const arr = db[colecao];
+    if (!arr) return;
+    if (acao === 'excluir') {
+      if (anterior) arr.push(anterior);
+    } else if (anterior) {
+      const i = arr.findIndex(x => x.id === anterior.id);
+      if (i >= 0) arr[i] = anterior; else arr.push(anterior);
+    } else {
+      const id = item && item.id;
+      const i = arr.findIndex(x => x.id === id);
+      if (i >= 0) arr.splice(i, 1);
+    }
+    save();
+    emit('change', { collection: colecao, desfeito: true });
+  }
+
+  function sincronizarConfig() {
+    if (modo !== 'nuvem' || !global.Backend) return;
+    Backend.salvarConfig(db.config).catch(err => {
+      emit('sync-error', { acao: 'config', colecao: 'configuracoes', mensagem: err.message });
+    });
   }
 
   function load() {
@@ -209,6 +264,56 @@
     return out;
   }
 
+  /**
+   * Entra no modo nuvem: substitui a base em memória pelo que veio
+   * do Supabase e passa a identificar quem está usando pelo login.
+   */
+  function hidratarDaNuvem(dados, usuarioLogado) {
+    modo = 'nuvem';
+    db = blank();
+    db.config = Object.assign(db.config, dados.config || {});
+    // listas de configuração nunca podem ficar vazias
+    const padrao = defaultConfig();
+    Object.keys(padrao).forEach(k => {
+      if (Array.isArray(padrao[k]) && (!Array.isArray(db.config[k]) || !db.config[k].length)) {
+        db.config[k] = padrao[k];
+      }
+    });
+    COLLECTIONS.forEach(c => { db[c] = Array.isArray(dados[c]) ? dados[c] : []; });
+    db.meta.usuarioAtivo = usuarioLogado ? usuarioLogado.id : null;
+    db.meta.modo = 'nuvem';
+    save();
+    emit('change', { collection: '*' });
+    return db;
+  }
+
+  /** Aplica uma mudança que veio de outra pessoa, em tempo real. */
+  function aplicarMudancaRemota(colecao, registro, removido) {
+    if (!db[colecao]) return false;
+    const arr = db[colecao];
+    const i = arr.findIndex(x => x.id === registro.id);
+    if (removido) {
+      if (i < 0) return false;
+      arr.splice(i, 1);
+    } else if (i >= 0) {
+      arr[i] = registro;
+    } else {
+      arr.push(registro);
+    }
+    save();
+    emit('change', { collection: colecao, remoto: true });
+    return true;
+  }
+
+  function aplicarConfigRemota(cfg) {
+    if (!cfg) return;
+    Object.assign(db.config, cfg);
+    save();
+    emit('change', { collection: 'config', remoto: true });
+  }
+
+  const modoAtual = () => modo;
+
   function reset(withSeed) {
     db = blank();
     if (withSeed !== false) seed(db);
@@ -225,9 +330,10 @@
   function upsert(col, obj, opts) {
     const silent = opts && opts.silent;
     const arr = db[col];
-    let saved;
+    let saved, anterior = null;
     if (obj.id && arr.some(x => x.id === obj.id)) {
       const i = arr.findIndex(x => x.id === obj.id);
+      anterior = Object.assign({}, arr[i]);
       saved = Object.assign({}, arr[i], obj, { atualizadoEm: new Date().toISOString() });
       arr[i] = saved;
     } else {
@@ -238,7 +344,11 @@
       if (!saved.id) saved.id = U.uid(col.slice(0, 3));
       arr.push(saved);
     }
-    if (!silent) { save(); emit('change', { collection: col, item: saved }); }
+    if (!silent) {
+      save();
+      sincronizar('salvar', col, saved, anterior);
+      emit('change', { collection: col, item: saved });
+    }
     return saved;
   }
 
@@ -246,9 +356,25 @@
     const i = db[col].findIndex(x => x.id === id);
     if (i < 0) return false;
     const item = db[col][i];
+    const antesDaCascata = {};
+    if (modo === 'nuvem') {
+      COLLECTIONS.forEach(c => { antesDaCascata[c] = db[c].map(x => x.id); });
+    }
     db[col].splice(i, 1);
     cascade(col, id);
     save();
+    if (modo === 'nuvem') {
+      sincronizar('excluir', col, id, item);
+      // o que a cascata levou junto também precisa sair do servidor
+      COLLECTIONS.forEach(c => {
+        const agora = new Set(db[c].map(x => x.id));
+        antesDaCascata[c].forEach(idAntigo => {
+          if (!agora.has(idAntigo) && !(c === col && idAntigo === id)) {
+            sincronizar('excluir', c, idAntigo, null);
+          }
+        });
+      });
+    }
     emit('change', { collection: col, removed: item });
     return true;
   }
@@ -290,6 +416,7 @@
       arr.push(item);
     }
     save();
+    sincronizarConfig();
     emit('change', { collection: 'config', key });
     return item;
   }
@@ -300,6 +427,7 @@
     if (i < 0) return false;
     arr.splice(i, 1);
     save();
+    sincronizarConfig();
     emit('change', { collection: 'config', key });
     return true;
   }
@@ -307,6 +435,7 @@
   function setConfig(patch) {
     Object.assign(db.config, patch);
     save();
+    sincronizarConfig();
     emit('change', { collection: 'config' });
   }
 
@@ -494,9 +623,12 @@
   function currentUser() {
     const u = L.usuario(db.meta.usuarioAtivo);
     if (u) return u;
+    // no modo nuvem a identidade vem do login: nunca "chutar" outro usuário
+    if (modo === 'nuvem') return null;
     return db.usuarios.find(x => x.perfil === 'admin') || db.usuarios[0] || null;
   }
   function setUser(id) {
+    if (modo === 'nuvem') return;   // quem manda é o login
     db.meta.usuarioAtivo = id;
     save();
     emit('user-change', currentUser());
@@ -504,7 +636,8 @@
   }
   function perfil() {
     const u = currentUser();
-    return PERFIS[(u && u.perfil) || 'admin'] || PERFIS.admin;
+    if (!u) return modo === 'nuvem' ? PERFIS.leitor : PERFIS.admin;
+    return PERFIS[u.perfil] || PERFIS.leitor;
   }
   function podeVer(rota) {
     const p = perfil();
@@ -810,6 +943,7 @@
     get db() { return db; },
     get config() { return db.config; },
     load, save, reset,
+    hidratarDaNuvem, aplicarMudancaRemota, aplicarConfigRemota, modo: modoAtual,
     list, get, upsert, remove,
     configList, configUpsert, configRemove, setConfig,
     L: L, lookup: L,

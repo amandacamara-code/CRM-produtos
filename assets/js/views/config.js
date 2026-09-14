@@ -15,6 +15,7 @@
     { id: 'status', nome: '🚦 Status e etapas' },
     { id: 'comissoes', nome: '🤝 Comissões e pagamentos' },
     { id: 'usuarios', nome: '👤 Usuários e acessos' },
+    { id: 'conexao', nome: '🔌 Conexão e equipe' },
     { id: 'dados', nome: '💾 Backup dos dados' }
   ];
 
@@ -218,10 +219,13 @@
     const usuarios = Store.list('usuarios');
     const atual = Store.currentUser() || {};
     return `
+      ${Store.modo() === 'nuvem' ? `<div class="notice mb">👥 Para incluir alguém: peça para a pessoa
+        abrir este endereço e clicar em <b>Criar conta</b>. Ela aparece aqui como <b>inativa</b> —
+        marque como ativa e escolha o perfil de acesso.</div>` : ''}
       <div class="card card--pad0 mb">
         <div class="card__head">
           <div><h3>👤 Usuários</h3><p>Perfis definem o que cada pessoa enxerga e pode editar</p></div>
-          ${pode ? `<button class="btn btn--sm btn--fire" data-novo-usuario>＋ Novo Usuário</button>` : ''}
+          ${pode && Store.modo() !== 'nuvem' ? `<button class="btn btn--sm btn--fire" data-novo-usuario>＋ Novo Usuário</button>` : ''}
         </div>
         <div class="card__body">
           <div class="vstack">
@@ -273,10 +277,14 @@
     return `
       <div class="card card--pad0 mb">
         <div class="card__head"><h3>💾 Dados armazenados</h3>
-          <p>Tudo fica salvo no navegador deste dispositivo (localStorage)</p></div>
+          <p>${Store.modo() === 'nuvem'
+            ? 'Base compartilhada no servidor — este navegador guarda só uma cópia para abrir rápido'
+            : 'Tudo fica salvo no navegador deste dispositivo (localStorage)'}</p></div>
         <div class="card__body">
           <dl class="deflist mb">${contagens}</dl>
-          <div class="notice mb">ℹ️ Os dados <b>não</b> são enviados para nenhum servidor. Para usar em outro computador, exporte o backup aqui e importe lá.</div>
+          <div class="notice mb">${Store.modo() === 'nuvem'
+            ? 'ℹ️ Os dados ficam no seu projeto do Supabase. O backup abaixo serve como cópia de segurança fora dele.'
+            : 'ℹ️ Os dados <b>não</b> são enviados para nenhum servidor. Para usar em outro computador, exporte o backup aqui e importe lá.'}</div>
           <div class="hstack">
             <button class="btn btn--ghost" data-backup>📥 Exportar backup (JSON)</button>
             ${pode ? `<button class="btn btn--ghost" data-restaurar>📤 Importar backup</button>` : ''}
@@ -285,16 +293,111 @@
         </div>
       </div>
 
-      ${pode ? `<div class="card card--pad0">
-        <div class="card__head"><h3>⚠️ Zona de risco</h3></div>
-        <div class="card__body">
-          <p class="small muted mb">Estas ações apagam informações e não podem ser desfeitas.</p>
-          <div class="hstack">
-            <button class="btn btn--ghost" data-resetar-demo>🔄 Recarregar dados de demonstração</button>
-            <button class="btn btn--red" data-limpar>🗑️ Começar do zero (apagar tudo)</button>
+      ${pode ? (Store.modo() === 'nuvem'
+        ? `<div class="card card--pad0">
+            <div class="card__head"><h3>⚠️ Zona de risco</h3></div>
+            <div class="card__body">
+              <div class="notice notice--warn">Conectado ao servidor, apagar tudo por aqui
+                mexeria só nesta tela e voltaria na próxima sincronização. Para zerar a base da
+                equipe, apague os registros direto no painel do Supabase — é uma ação que afeta
+                todo mundo.</div>
+            </div>
+          </div>`
+        : `<div class="card card--pad0">
+            <div class="card__head"><h3>⚠️ Zona de risco</h3></div>
+            <div class="card__body">
+              <p class="small muted mb">Estas ações apagam informações e não podem ser desfeitas.</p>
+              <div class="hstack">
+                <button class="btn btn--ghost" data-resetar-demo>🔄 Recarregar dados de demonstração</button>
+                <button class="btn btn--red" data-limpar>🗑️ Começar do zero (apagar tudo)</button>
+              </div>
+            </div>
+          </div>`) : ''}`;
+  }
+
+  function abaConexao() {
+    const naNuvem = Store.modo() === 'nuvem';
+    const cfg = Backend.configurado() ? Backend.config() : { url: '', anonKey: '' };
+    const porArquivo = !!(window.FIRECE_SUPABASE && window.FIRECE_SUPABASE.url);
+    const perfilServidor = Backend.meuPerfil();
+    const pode = Store.podeConfigurar('usuarios');
+
+    if (naNuvem) {
+      const contagem = Store.COLLECTIONS
+        .map(c => `<div><dt>${c}</dt><dd>${U.num(Store.list(c).length)}</dd></div>`).join('');
+      return `
+        <div class="card card--pad0 mb">
+          <div class="card__head"><h3>🟢 Conectado ao servidor</h3>
+            <p>Todo mundo da equipe trabalha na mesma base</p></div>
+          <div class="card__body">
+            <dl class="deflist mb">
+              <div><dt>Projeto</dt><dd class="mono" style="font-size:12px">${U.esc(cfg.url)}</dd></div>
+              <div><dt>Você está como</dt><dd>${U.esc(perfilServidor ? perfilServidor.email : '')}</dd></div>
+              <div><dt>Seu perfil</dt><dd>${U.esc((Store.PERFIS[perfilServidor ? perfilServidor.perfil : ''] || {}).nome || '')}</dd></div>
+            </dl>
+            <div class="notice">🔒 As permissões valem no banco, não só na tela: um consultor não
+              alcança os dados de outro nem chamando a API diretamente.</div>
+            <div class="subhead">Registros no servidor</div>
+            <dl class="deflist">${contagem}</dl>
           </div>
         </div>
-      </div>` : ''}`;
+
+        <div class="card card--pad0">
+          <div class="card__head"><h3>👥 Convidar o time</h3></div>
+          <div class="card__body">
+            <ol class="small muted" style="padding-left:18px;line-height:1.9;margin:0">
+              <li>Peça para a pessoa abrir este mesmo endereço e clicar em <b>Criar conta</b>.</li>
+              <li>Ela entra <b>bloqueada</b>, por segurança.</li>
+              <li>Você abre <b>Configurações → Usuários</b>, marca como ativa e escolhe o perfil.</li>
+            </ol>
+            ${pode ? `<button class="btn btn--ghost mt" data-ir-usuarios>Ir para Usuários →</button>` : ''}
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="notice notice--warn mb">📍 Hoje os dados ficam <b>só neste navegador</b>.
+        Para a equipe inteira usar a mesma base, com login e senha, conecte um projeto do Supabase.</div>
+
+      <div class="card card--pad0 mb">
+        <div class="card__head"><h3>🔌 Conectar ao servidor</h3>
+          <p>Leva cerca de 10 minutos, uma única vez</p></div>
+        <div class="card__body">
+          <ol class="small muted" style="padding-left:18px;line-height:1.9">
+            <li>Crie uma conta gratuita em <b>supabase.com</b> e um projeto novo.</li>
+            <li>No projeto, abra <b>SQL Editor → New query</b>, cole o conteúdo do arquivo
+              <code class="mono">supabase/schema.sql</code> e clique em <b>Run</b>.</li>
+            <li>Vá em <b>Project Settings → API</b> e copie a <b>Project URL</b> e a chave <b>anon public</b>.</li>
+            <li>Cole as duas aqui embaixo.</li>
+          </ol>
+
+          <form class="formgrid mt" id="formConexao">
+            ${UI.campo({ label: 'Project URL', name: 'url', valor: cfg.url, full: true,
+              placeholder: 'https://xxxxxxxx.supabase.co' })}
+            ${UI.campo({ label: 'Chave anon public', name: 'anonKey', valor: cfg.anonKey, full: true,
+              placeholder: 'eyJhbGciOiJIUzI1NiIs…',
+              hint: 'Esta chave é pública por natureza e não dá acesso aos dados sozinha. Nunca use a chave service_role aqui.' })}
+          </form>
+          <div class="hstack mt">
+            <button class="btn btn--ghost" data-testar>🔍 Testar conexão</button>
+            <button class="btn btn--fire" data-conectar>Conectar e enviar meus dados</button>
+          </div>
+          <p class="small muted mt" id="statusConexao"></p>
+          ${porArquivo ? `<div class="notice mt">ℹ️ Já existe uma conexão definida no arquivo
+            <code class="mono">assets/js/firece-config.js</code>, que tem prioridade sobre o que for salvo aqui.</div>` : ''}
+        </div>
+      </div>
+
+      <div class="card card--pad0">
+        <div class="card__head"><h3>📤 O que acontece com os dados atuais</h3></div>
+        <div class="card__body">
+          <p class="small muted">Ao conectar, os
+            <b>${U.num(U.sum(Store.COLLECTIONS, c => Store.list(c).length))} registros</b> deste navegador
+            são enviados para o servidor e passam a ser a base da equipe. Nada é apagado daqui.</p>
+          <p class="small muted mt-sm">Se a base ainda for a de demonstração, use antes
+            <b>Backup dos dados → Começar do zero</b>, para não subir dados fictícios.</p>
+        </div>
+      </div>`;
   }
 
   Views.config = {
@@ -330,6 +433,7 @@
               'O campo "meses" define a receita mensal equivalente na carteira.');
           break;
         case 'usuarios': conteudo = abaUsuarios(); break;
+        case 'conexao': conteudo = abaConexao(); break;
         case 'dados': conteudo = abaDados(); break;
       }
 
@@ -413,6 +517,63 @@
         const u = Store.get('usuarios', b.getAttribute('data-u-del'));
         Forms.excluir('usuarios', u.id, u.nome);
       });
+
+      /* conexão */
+      const irUsuarios = el.querySelector('[data-ir-usuarios]');
+      if (irUsuarios) irUsuarios.onclick = () => { estado.aba = 'usuarios'; App.render(); };
+
+      const status = el.querySelector('#statusConexao');
+      const dizer = (msg, tipo) => {
+        if (!status) return;
+        status.textContent = msg;
+        status.className = 'small mt ' + (tipo === 'erro' ? 'neg' : tipo === 'ok' ? 'pos' : 'muted');
+      };
+      const lerConexao = () => {
+        const f = UI.lerForm(el.querySelector('#formConexao'));
+        return { url: String(f.url || '').trim(), anonKey: String(f.anonKey || '').trim() };
+      };
+
+      const btnTestar = el.querySelector('[data-testar]');
+      if (btnTestar) btnTestar.onclick = async () => {
+        const { url, anonKey } = lerConexao();
+        if (!url || !anonKey) return dizer('Preencha a URL e a chave.', 'erro');
+        btnTestar.disabled = true;
+        dizer('Testando…');
+        try {
+          await Backend.testarConexao(url, anonKey);
+          dizer('✅ Conexão e tabelas encontradas. Pode conectar.', 'ok');
+        } catch (e) { dizer('❌ ' + e.message, 'erro'); }
+        btnTestar.disabled = false;
+      };
+
+      const btnConectar = el.querySelector('[data-conectar]');
+      if (btnConectar) btnConectar.onclick = async () => {
+        const { url, anonKey } = lerConexao();
+        if (!url || !anonKey) return dizer('Preencha a URL e a chave.', 'erro');
+
+        const total = U.sum(Store.COLLECTIONS, c => Store.list(c).length);
+        const ok = await UI.confirmar({
+          titulo: 'Conectar ao servidor',
+          confirmar: 'Conectar',
+          mensagem: `Os <b>${U.num(total)} registros</b> deste navegador serão enviados para o servidor.<br><br>
+            Em seguida você cria a <b>primeira conta</b>, que vira a administradora — e é ela que libera o
+            acesso do restante do time.`
+        });
+        if (!ok) return;
+
+        btnConectar.disabled = true;
+        dizer('Validando conexão…');
+        try {
+          await Backend.testarConexao(url, anonKey);
+          Backend.salvarConfigConexao(url, anonKey);
+          sessionStorage.setItem('crm_firece_migrar', '1');
+          dizer('✅ Conectado. Recarregando para você criar a conta de administrador…', 'ok');
+          setTimeout(() => location.reload(), 1200);
+        } catch (e) {
+          dizer('❌ ' + e.message, 'erro');
+          btnConectar.disabled = false;
+        }
+      };
 
       /* backup */
       const bk = el.querySelector('[data-backup]');
