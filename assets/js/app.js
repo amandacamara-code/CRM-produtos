@@ -142,7 +142,8 @@
 
       document.getElementById('pageTitle').textContent = view.titulo;
       document.getElementById('pageSubtitle').textContent = view.subtitulo || '';
-      document.title = view.titulo.replace(/^[^\wÀ-ſ]+/, '') + ' · CRM Produtos';
+      const nomeTela = view.titulo.replace(/^[^\wÀ-ſ]+/, '').trim();
+      document.title = nomeTela === 'CRM Produtos' ? nomeTela : nomeTela + ' · CRM Produtos';
 
       const scroll = window.scrollY;
       try {
