@@ -1,7 +1,7 @@
 # Publicação do CRM de Produtos da Firece
+# O projeto é HTML/CSS/JS puro: não há etapa de build.
 [build]
   publish = "."
-  command = ""
 
 # Cabeçalhos de segurança. Não bloqueiam o Supabase nem o CDN da
 # biblioteca dele — só fecham o que o sistema não usa.
