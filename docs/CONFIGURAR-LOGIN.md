@@ -36,10 +36,14 @@ chamadas de rede e o login não funcionaria lá.
 O caminho mais simples, já com atualização automática a cada alteração:
 
 1. Entre em **https://app.netlify.com** → **Add new project** → **Import an existing project**.
-2. Escolha **GitHub** e selecione o repositório `CRM-produtos`.
-3. Em **Branch to deploy**, escolha `claude/crm-produtos-web-ad50hx`.
+2. Escolha **Deploy with GitHub** e selecione `amandacamara-code/CRM-produtos`.
+3. **Branch to deploy:** `claude/crm-produtos-web-ad50hx` (já é o padrão do repositório).
 4. Deixe **Build command** vazio e **Publish directory** como `.` — o projeto não precisa de build.
 5. **Deploy**.
+
+> ⚠️ A Netlify publica a partir do **repositório do GitHub**, não de um endereço de
+> página pronta. O link da pré-visualização na claude.ai serve para ver e testar o
+> sistema, mas não é uma fonte de onde se possa publicar.
 
 Em um minuto você recebe um endereço tipo
 `https://crm-produtos-firece.netlify.app`. É esse que o time vai usar.

@@ -23,7 +23,29 @@ O dashboard começa pelos números que respondem "como está a operação?" em 1
 
 ---
 
-## Como usar
+## Publicar na Netlify
+
+O repositório já está pronto para publicar — **não há etapa de build**.
+
+1. Acesse **https://app.netlify.com** → **Add new project** → **Import an existing project**
+2. **Deploy with GitHub** → autorize se for pedido
+3. Escolha o repositório **`amandacamara-code/CRM-produtos`**
+4. **Branch to deploy:** `claude/crm-produtos-web-ad50hx` — já é o branch padrão do
+   repositório, então vem selecionado sozinho
+5. **Build command:** deixe vazio · **Publish directory:** `.`
+6. **Deploy**
+
+O `netlify.toml` na raiz já define a pasta de publicação, os cabeçalhos de segurança
+e bloqueia o acesso web a `docs/` e `supabase/`.
+
+> Depois de publicar, confira em *Site configuration → Access control* se o login
+> obrigatório do Netlify (SSO) está desligado — com ele ativo, quem não tem conta na
+> sua equipe do Netlify não alcança nem a tela de login do CRM.
+
+Publicar coloca o sistema no ar em **modo demonstração**. O login com senha de verdade
+começa ao conectar o servidor: veja [docs/CONFIGURAR-LOGIN.md](docs/CONFIGURAR-LOGIN.md).
+
+## Rodar no seu computador
 
 Abra o `index.html` no navegador. Não há build, servidor, dependências nem instalação.
 
