@@ -290,7 +290,11 @@
       throw new Error('Conectou no projeto, mas as tabelas não existem. Rode o arquivo supabase/schema.sql no SQL Editor.');
     }
     if (error && /Invalid API key|JWT/i.test(error.message)) throw new Error('Chave anon inválida.');
-    if (error && /Failed to fetch/i.test(error.message)) throw new Error('Não foi possível alcançar essa URL. Confira o endereço do projeto.');
+    if (error && /Failed to fetch/i.test(error.message)) {
+      throw new Error('Não foi possível alcançar essa URL. Confira o endereço do projeto — e note que ' +
+        'o CRM precisa estar publicado num endereço próprio (Netlify, Vercel, GitHub Pages…): ' +
+        'alguns ambientes de pré-visualização bloqueiam chamadas de rede.');
+    }
     if (error) throw new Error(error.message);
     return true;
   }

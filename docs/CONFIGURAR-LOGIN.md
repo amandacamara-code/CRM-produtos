@@ -25,7 +25,28 @@ produtos.
 
 ---
 
-## Passo 1 — Criar o projeto
+## Passo 0 — Publicar o CRM num endereço próprio
+
+O modo equipe conversa com o Supabase pela rede. Para isso, o CRM precisa
+estar publicado num endereço de verdade — **Netlify**, Vercel, GitHub
+Pages, Cloudflare Pages ou o servidor da empresa. Ambientes de
+pré-visualização (inclusive a versão hospedada na claude.ai) bloqueiam
+chamadas de rede e o login não funcionaria lá.
+
+O caminho mais simples, já com atualização automática a cada alteração:
+
+1. Entre em **https://app.netlify.com** → **Add new project** → **Import an existing project**.
+2. Escolha **GitHub** e selecione o repositório `CRM-produtos`.
+3. Em **Branch to deploy**, escolha `claude/crm-produtos-web-ad50hx`.
+4. Deixe **Build command** vazio e **Publish directory** como `.` — o projeto não precisa de build.
+5. **Deploy**.
+
+Em um minuto você recebe um endereço tipo
+`https://crm-produtos-firece.netlify.app`. É esse que o time vai usar.
+
+---
+
+## Passo 1 — Criar o projeto no Supabase
 
 1. Entre em **https://supabase.com** e crie uma conta (pode ser com o Google).
 2. Clique em **New project**.
